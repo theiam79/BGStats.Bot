@@ -1,4 +1,5 @@
-﻿using BGStats.Bot.Services;
+﻿using BGStats.Bot.Modules;
+using BGStats.Bot.Services;
 using Discord;
 using Discord.Addons.Hosting;
 using Discord.Addons.Interactive;
@@ -69,7 +70,10 @@ namespace BGStats.Bot
           services
             .AddHostedService<CommandHandler>()
             .AddSingleton<InteractiveService>()
-            .AddSingleton<Helper>();
+            .AddTransient<PlayFormatService>()
+            .AddTransient<PostingService>()
+            .AddSingleton<Helper>()
+            .AddHttpClient();
         });
 
       var host = builder.Build();
