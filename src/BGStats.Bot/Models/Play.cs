@@ -40,6 +40,9 @@ namespace BGStats.Bot.Models
     [JsonPropertyName("gameRefId")]
     public int GameRefId { get; set; }
 
+    [JsonPropertyName("board")]
+    public string Board { get; set; }
+
     [JsonPropertyName("scoringSetting")]
     public int ScoringSetting { get; set; }
 

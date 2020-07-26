@@ -71,6 +71,15 @@ namespace BGStats.Bot.Services
         }
       }
 
+      if (!string.IsNullOrEmpty(play.Board))
+      {
+        builder.AddField(x =>
+        {
+          x.Name = "Notes";
+          x.Value = play.Board;
+        });
+      }
+
       return builder.Build();
     }
 
