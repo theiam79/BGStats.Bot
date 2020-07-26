@@ -48,7 +48,7 @@ namespace BGStats.Bot.Modules
       await ReplyAsync(
           $"{Format.Bold("Info")}\n" +
           "- Developed by TheIAm79#0951\n" +
-          "- Github: `URL_HERE` \n" +
+          "- Github: `https://github.com/theiam79/BGStats.Bot` \n" +
           $"- Library: Discord.Net ({DiscordConfig.Version})\n" +
           $"- Runtime: {RuntimeInformation.FrameworkDescription} {RuntimeInformation.OSArchitecture}\n" +
           $"- Uptime: {GetUptime()}\n\n" +
