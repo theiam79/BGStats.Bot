@@ -36,39 +36,43 @@ namespace BGStats.Bot.Services
         foreach (var team in teams)
         {
           var teamWon = team.Any(x => x.Winner);
-          builder.AddField(x =>
-          {
-            x.Name = $"\r\nTeam {i++}{(teamWon ? " :trophy:" : "")}";
-            x.Value = "----------------------------------------------------";
-          });
+          var teamName = $"\r\nTeam {i++}{(teamWon ? " :trophy:" : "")}";
+
+          var sb = new StringBuilder();
 
           foreach (var playerScore in team)
           {
             var playerData = players.FirstOrDefault(x => x.Id == playerScore.PlayerRefId);
             if (playerData == null) continue;
 
-            builder.AddField(x =>
-            {
-              x.Name = $"{playerData.Name}{(string.IsNullOrEmpty(playerScore.Score) ? "" : $" - {playerScore.Score}")}";
-              x.Value = $"```{(string.IsNullOrEmpty(playerScore.TeamRole) ? "" : $"Role: {playerScore.TeamRole}\r\n")}BGG: {(string.IsNullOrEmpty(playerData.BggUsername) ? "Not set" : playerData.BggUsername)}```";
-              //x.IsInline = true;
-            });
+            sb.AppendLine($"{playerData.Name}{(string.IsNullOrEmpty(playerScore.Score) ? "" : $" - {playerScore.Score}")}");
+            sb.AppendLine($"```{(string.IsNullOrEmpty(playerScore.TeamRole) ? "" : $"Role: {playerScore.TeamRole}\r\n")}BGG: {(string.IsNullOrEmpty(playerData.BggUsername) ? "Not set" : playerData.BggUsername)}```");
           }
+
+          builder.AddField(x =>
+          {
+            x.Name = teamName;
+            x.Value = sb.ToString();
+          });
         }
       }
       else
       {
-        foreach (var playerScore in playerScores)//.OrderBy(p => p.Winner ? 0 : 1))
+        var sb = new StringBuilder();
+        foreach (var playerScore in playerScores)
         {
           var playerData = players.FirstOrDefault(x => x.Id == playerScore.PlayerRefId);
           if (playerData == null) continue;
 
-          builder.AddField(x =>
-          {
-            x.Name = $"{playerData.Name}{(string.IsNullOrEmpty(playerScore.Score) ? "" : $" - {playerScore.Score}")}{(playerScore.Winner ? " :trophy:" : "")}";
-            x.Value = $"```{(string.IsNullOrEmpty(playerScore.Role) ? "" : $"Role: {playerScore.Role}\r\n")}BGG: {(string.IsNullOrEmpty(playerData.BggUsername) ? "Not set" : playerData.BggUsername)}```";
-          });
+          sb.AppendLine($"{playerData.Name}{(string.IsNullOrEmpty(playerScore.Score) ? "" : $" - {playerScore.Score}")}{(playerScore.Winner ? " :trophy:" : "")}");
+          sb.AppendLine($"```{(string.IsNullOrEmpty(playerScore.Role) ? "" : $"Role: {playerScore.Role}\r\n")}BGG: {(string.IsNullOrEmpty(playerData.BggUsername) ? "Not set" : playerData.BggUsername)}```");
         }
+
+        builder.AddField(x =>
+        {
+          x.Name = "Players";
+          x.Value = sb.ToString();
+        });
       }
 
       if (!string.IsNullOrEmpty(play.Board))
