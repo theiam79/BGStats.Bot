@@ -79,7 +79,7 @@ namespace BGStats.Bot.Services
       {
         builder.AddField(x =>
         {
-          x.Name = "Notes";
+          x.Name = "Board, Variant or Expansions";
           x.Value = play.Board;
         });
       }
