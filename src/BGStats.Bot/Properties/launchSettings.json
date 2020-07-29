@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "BGStats.Bot": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}
