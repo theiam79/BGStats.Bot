@@ -1,4 +1,5 @@
-﻿using BGStats.Bot.Models;
+﻿using BGStats.Bot.Converters;
+using BGStats.Bot.Models;
 using BGStats.Bot.Services;
 using Discord.Commands;
 using System;
@@ -31,7 +32,11 @@ namespace BGStats.Bot.Modules
     {
       var playFile = Context.Message.Attachments.FirstOrDefault(x => x.Filename.EndsWith(".bgsplay"));
       var playFileContents = await _httpClientFactory.CreateClient().GetStreamAsync(playFile.Url);
-      var play = await JsonSerializer.DeserializeAsync<PlayFile>(playFileContents);
+
+      var serializerOptions = new JsonSerializerOptions();
+      serializerOptions.Converters.Add(new AutoIntToBoolConverter());
+
+      var play = await JsonSerializer.DeserializeAsync<PlayFile>(playFileContents, serializerOptions);
 
       await _postingService.PostAsync(_playFormatService.FormatPlay(play));
     }
