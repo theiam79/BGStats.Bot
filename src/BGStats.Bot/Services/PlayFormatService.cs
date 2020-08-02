@@ -1,4 +1,5 @@
 ﻿using BGStats.Bot.Models;
+using NCalc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +27,7 @@ namespace BGStats.Bot.Services
 
       if (DateTimeOffset.TryParse(play.EntryDate, out DateTimeOffset timestamp))
       {
-        builder.WithTimestamp(timestamp);
+        builder.WithTimestamp(timestamp.ToLocalTime());
       }
 
       if (play.UsesTeams)
@@ -64,7 +65,7 @@ namespace BGStats.Bot.Services
           var playerData = players.FirstOrDefault(x => x.Id == playerScore.PlayerRefId);
           if (playerData == null) continue;
 
-          sb.AppendLine($"{playerData.Name}{(string.IsNullOrEmpty(playerScore.Score) ? "" : $" - {playerScore.Score}")}{(playerScore.Winner ? " :trophy:" : "")}");
+          sb.AppendLine($"{playerData.Name}{(string.IsNullOrEmpty(playerScore.Score) ? "" : $" - {new Expression(playerScore.Score, EvaluateOptions.None).Evaluate()}")}{(playerScore.Winner ? " :trophy:" : "")}");
           sb.AppendLine($"```{(string.IsNullOrEmpty(playerScore.Role) ? "" : $"Role: {playerScore.Role}\r\n")}BGG: {(string.IsNullOrEmpty(playerData.BggUsername) ? "Not set" : playerData.BggUsername)}```");
         }
 
