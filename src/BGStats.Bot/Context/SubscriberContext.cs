@@ -13,7 +13,12 @@ namespace BGStats.Bot.Context
 
     public DbSet<Subscriber> Subscribers { get; set; }
 
-
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+      modelBuilder.Entity<Subscriber>()
+        .Property(p => p.SubscriberId)
+        .ValueGeneratedOnAdd();
+    }
   }
 
   public class SubscriberContextFactory : IDesignTimeDbContextFactory<SubscriberContext>
