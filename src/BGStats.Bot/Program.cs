@@ -1,10 +1,12 @@
-﻿using BGStats.Bot.Modules;
+﻿using BGStats.Bot.Context;
+using BGStats.Bot.Modules;
 using BGStats.Bot.Services;
 using Discord;
 using Discord.Addons.Hosting;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -73,7 +75,11 @@ namespace BGStats.Bot
             .AddTransient<PlayFormatService>()
             .AddTransient<PostingService>()
             .AddSingleton<Helper>()
-            .AddHttpClient();
+            .AddHttpClient()
+            .AddDbContext<SubscriberContext>(options =>
+            {
+              options.UseSqlite(context.Configuration.GetConnectionString("SubscriberDB"));  
+            }, ServiceLifetime.Transient);
         });
 
       var host = builder.Build();

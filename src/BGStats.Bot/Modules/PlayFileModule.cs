@@ -35,7 +35,7 @@ namespace BGStats.Bot.Modules
 
       var serializerOptions = new JsonSerializerOptions();
       serializerOptions.Converters.Add(new AutoIntToBoolConverter());
-
+      
       var play = await JsonSerializer.DeserializeAsync<PlayFile>(playFileContents, serializerOptions);
 
       await _postingService.PostAsync(_playFormatService.FormatPlay(play));
