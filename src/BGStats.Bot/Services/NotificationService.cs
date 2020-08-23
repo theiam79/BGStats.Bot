@@ -55,12 +55,14 @@ namespace BGStats.Bot.Services
       await _subscriberContext.SaveChangesAsync();
     }
 
-    public async Task Notify(string fileName, Stream stream, PlayFile playFile)
+    public async Task Notify(string fileName, Stream stream, PlayFile playFile, ulong sender)
     {
-      var targets = await _subscriberContext.Subscribers.AsQueryable().Where(x => playFile.Players.Any(p => p.Name == x.PlayerName)).Select(s => s.DiscordId).Distinct().ToListAsync();
+      var targets = await _subscriberContext.Subscribers.ToAsyncEnumerable().Where(x => playFile.Players.Any(p => p.Name == x.PlayerName)).Select(s => s.DiscordId).Distinct().ToListAsync();
       
       foreach (var target in targets)
       {
+        if (target == sender) continue;
+
         var channel = await _client.GetUser(target)?.GetOrCreateDMChannelAsync();
 
         if (channel != null)

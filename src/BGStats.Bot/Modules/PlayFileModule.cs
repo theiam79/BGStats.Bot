@@ -45,7 +45,7 @@ namespace BGStats.Bot.Modules
 
       var play = await JsonSerializer.DeserializeAsync<PlayFile>(contentStream, serializerOptions);
       await _postingService.PostAsync(_playFormatService.FormatPlay(play));
-      await _notificationService.Notify(playFile.Filename, contentStream, play);
+      await _notificationService.Notify(playFile.Filename, contentStream, play, Context.User.Id);
     }
   }
 
