@@ -57,7 +57,7 @@ namespace BGStats.Bot.Services
 
     public async Task Notify(string fileName, Stream stream, PlayFile playFile, ulong sender)
     {
-      var targets = await _subscriberContext.Subscribers.ToAsyncEnumerable().Where(x => playFile.Players.Any(p => p.Name == x.PlayerName)).Select(s => s.DiscordId).Distinct().ToListAsync();
+      var targets = await _subscriberContext.Subscribers.AsNoTracking().ToAsyncEnumerable().Where(x => playFile.Players.Any(p => p.Name == x.PlayerName)).Select(s => s.DiscordId).Distinct().ToListAsync();
       
       foreach (var target in targets)
       {
