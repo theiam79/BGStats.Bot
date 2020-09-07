@@ -72,6 +72,7 @@ namespace BGStats.Bot.Services
           stream.Seek(0, SeekOrigin.Begin);
           var copy = new MemoryStream();
           await stream.CopyToAsync(copy);
+          copy.Seek(0, SeekOrigin.Begin);
           await channel.SendFileAsync(copy, fileName, "A play file that included you was shared!");
         }
       }
