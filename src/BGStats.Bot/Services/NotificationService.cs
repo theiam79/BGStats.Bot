@@ -65,8 +65,6 @@ namespace BGStats.Bot.Services
 
         var channel = await _client.GetUser(target)?.GetOrCreateDMChannelAsync();
 
-
-
         if (channel != null)
         {
           stream.Seek(0, SeekOrigin.Begin);
