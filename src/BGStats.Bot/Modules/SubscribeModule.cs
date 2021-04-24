@@ -58,7 +58,7 @@ namespace BGStats.Bot.Modules
     public async Task ListAllSubscriptions()
     {
       var subs = await _notificationService.GetAllSubscriptions();
-      var message = new StringBuilder().AppendLine($"Found {subs.Count} total subscriptions").AppendJoin('\n', subs.Select(s => $"{Context.Client.GetUser(s.DiscordId).Username} - {s.PlayerName}")).ToString();
+      var message = new StringBuilder().AppendLine($"Found {subs.Count} total subscriptions").AppendJoin('\n', subs.Select(s => $"{Context.Client.GetUser(s.DiscordId)?.Username ?? $"Something went wrong {s.DiscordId}"} - {s.PlayerName}")).ToString();
       var channel = await Context.User.GetOrCreateDMChannelAsync();
       await channel.SendMessageAsync(message);
     }
