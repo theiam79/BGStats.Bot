@@ -46,7 +46,7 @@ namespace BGStats.Bot
           {
             config.WriteTo.Sentry(o =>
             {
-              o.Dsn = new Dsn(context.Configuration["sentry"]);
+              o.Dsn = context.Configuration["sentry"];
               o.MinimumBreadcrumbLevel = LogEventLevel.Debug;
               o.MinimumEventLevel = LogEventLevel.Error;
             });
