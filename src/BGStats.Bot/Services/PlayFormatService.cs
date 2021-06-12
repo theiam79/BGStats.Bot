@@ -105,7 +105,7 @@ namespace BGStats.Bot.Services
       {
         var duration = TimeSpan.FromMinutes(play.DurationMin);
         var timeDescription = duration.Hours > 0 ? $"{duration.Hours} hours" : "";
-        timeDescription += duration.Minutes % 60 != 0 ? $"{duration.Minutes} minutes" : "";
+        timeDescription += duration.Minutes % 60 != 0 ? $" {duration.Minutes} minutes" : "";
         descriptionItems.Add(timeDescription);
       }
 
