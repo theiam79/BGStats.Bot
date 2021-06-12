@@ -1,7 +1,9 @@
 ﻿using BGStats.Bot.Converters;
 using BGStats.Bot.Models;
 using BGStats.Bot.Services;
+using Discord.Addons.Interactive;
 using Discord.Commands;
+using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace BGStats.Bot.Modules
 {
-  public class PlayFileModule : ModuleBase<SocketCommandContext>
+  public class PlayFileModule : InteractiveBase<SocketCommandContext>
   {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly PlayFormatService _playFormatService;
@@ -33,6 +35,13 @@ namespace BGStats.Bot.Modules
     [RequirePlayfile]
     public async Task SharePlayFile()
     {
+
+      await Context.Channel.SendMessageAsync("Play file recieved. Respond with a picture if you would like to include one.");
+
+      var imageMessageTask = NextMessageAsync(true, true, TimeSpan.FromSeconds(15));
+
+
+
       var playFile = Context.Message.Attachments.FirstOrDefault(x => x.Filename.EndsWith(".bgsplay"));
       var playFileContents = await _httpClientFactory.CreateClient().GetStreamAsync(playFile.Url);
 
@@ -44,7 +53,11 @@ namespace BGStats.Bot.Modules
       serializerOptions.Converters.Add(new AutoIntToBoolConverter());
 
       var play = await JsonSerializer.DeserializeAsync<PlayFile>(contentStream, serializerOptions);
-      await _postingService.PostAsync(_playFormatService.FormatPlay(play));
+
+
+      var imageAttachment = (await imageMessageTask)?.Attachments.FirstOrDefault(x => x.Filename.EndsWith(".jpg"));
+
+      await _postingService.PostAsync(_playFormatService.FormatPlay(play, imageAttachment?.Url));
       await _notificationService.Notify(playFile.Filename, contentStream, play, Context.User.Id);
     }
   }

@@ -10,7 +10,7 @@ namespace BGStats.Bot.Services
 {
   public class PlayFormatService
   {
-    public Discord.Embed FormatPlay(PlayFile playFile)
+    public Discord.Embed FormatPlay(PlayFile playFile, string imageUrl = null)
     {
       var game = playFile.Games.FirstOrDefault();
       var location = playFile.Locations.FirstOrDefault();
@@ -24,6 +24,8 @@ namespace BGStats.Bot.Services
         .WithFooter(BuildFooter(game))
         .WithThumbnailUrl(game.UrlThumb)
         .WithColor(Discord.Color.Green);
+
+      if (imageUrl != null) { builder.WithImageUrl(imageUrl); }
 
       if (DateTimeOffset.TryParse(play.EntryDate, out DateTimeOffset timestamp))
       {
@@ -90,36 +92,26 @@ namespace BGStats.Bot.Services
 
     string BuildDescription(Location location, Play play)
     {
-      var sb = new StringBuilder()
-        .Append(location.Name)
-        .Append(" - ");
+      var descriptionItems = new List<string>();
 
-      if (play.Rounds != 0)
-      {
-        sb.Append($"{play.Rounds} Rounds - ");
-      }
-
+      descriptionItems.Add(location.Name);
+      if (play.Rounds != 0) { descriptionItems.Add($"{play.Rounds} Rounds"); }
+      
       if (play.DurationMin == 0)
       {
-        sb.Append("Untimed");
+        descriptionItems.Add("Untimed");
       }
       else
       {
         var duration = TimeSpan.FromMinutes(play.DurationMin);
-        sb.Append($"{duration.Hours} hours");
-
-        if (play.DurationMin % 60 != 0)
-        {
-          sb.Append($" {duration.Minutes} minutes");
-        }
+        var timeDescription = duration.Hours > 0 ? $"{duration.Hours} hours" : "";
+        timeDescription += duration.Minutes % 60 != 0 ? $"{duration.Minutes} minutes" : "";
+        descriptionItems.Add(timeDescription);
       }
 
-      if (play.Ignored)
-      {
-        sb.Append(" - *Ignored for stats*");
-      }
+      if (play.Ignored) { descriptionItems.Add(Discord.Format.Bold("Ignored for stats")); }
 
-      return sb.ToString();
+      return new StringBuilder().AppendJoin(" - ", descriptionItems).ToString();
     }
 
     string BuildFooter(Game game)
