@@ -38,7 +38,7 @@ namespace BGStats.Bot.Modules
 
       await Context.Channel.SendMessageAsync("Play file recieved. Respond with a picture if you would like to include one.");
 
-      var imageMessageTask = NextMessageAsync(true, true, TimeSpan.FromSeconds(15));
+      var imageMessageTask = NextMessageAsync(true, true, TimeSpan.FromSeconds(20));
 
 
 
@@ -55,10 +55,24 @@ namespace BGStats.Bot.Modules
       var play = await JsonSerializer.DeserializeAsync<PlayFile>(contentStream, serializerOptions);
 
 
-      var imageAttachment = (await imageMessageTask)?.Attachments.FirstOrDefault(x => x.Filename.EndsWith(".jpg"));
+      var imageAttachment = (await imageMessageTask)?.Attachments.FirstOrDefault(x => PhotoExtension(x.Filename));
 
       await _postingService.PostAsync(_playFormatService.FormatPlay(play, imageAttachment?.Url));
       await _notificationService.Notify(playFile.Filename, contentStream, play, Context.User.Id);
+    }
+
+    private readonly List<string> validImageExtensions = new List<string>
+    {
+      ".jpg",
+      ".jpeg",
+      ".png",
+      //".gif", // Do I trust people with these?
+      //".gifv"
+    };
+
+    private bool PhotoExtension(string fileName)
+    {
+      return validImageExtensions.Any(vie => fileName.EndsWith(vie, StringComparison.InvariantCultureIgnoreCase));
     }
   }
 
