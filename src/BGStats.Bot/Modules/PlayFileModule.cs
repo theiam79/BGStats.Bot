@@ -4,6 +4,7 @@ using BGStats.Bot.Services;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -21,13 +22,15 @@ namespace BGStats.Bot.Modules
     private readonly PlayFormatService _playFormatService;
     private readonly PostingService _postingService;
     private readonly INotificationService _notificationService;
+    private readonly ILogger<PlayFileModule> _logger;
 
-    public PlayFileModule(IHttpClientFactory httpClientFactory, PlayFormatService playFormatService, PostingService postingService, INotificationService notificationService)
+    public PlayFileModule(IHttpClientFactory httpClientFactory, PlayFormatService playFormatService, PostingService postingService, INotificationService notificationService, ILogger<PlayFileModule> logger)
     {
       _httpClientFactory = httpClientFactory;
       _playFormatService = playFormatService;
       _postingService = postingService;
       _notificationService = notificationService;
+      _logger = logger;
     }
 
     [Command("sharePlayFile")]
@@ -35,7 +38,7 @@ namespace BGStats.Bot.Modules
     [RequirePlayfile]
     public async Task SharePlayFile()
     {
-
+      _logger.LogDebug("Received play file from {DiscordUser}", Context.User.Username);
       await Context.Channel.SendMessageAsync("Play file recieved. Respond with a picture if you would like to include one.");
 
       var imageMessageTask = NextMessageAsync(true, true, TimeSpan.FromSeconds(20));
@@ -54,8 +57,18 @@ namespace BGStats.Bot.Modules
 
       var play = await JsonSerializer.DeserializeAsync<PlayFile>(contentStream, serializerOptions);
 
+      var imageMessage = await imageMessageTask;
 
-      var imageAttachment = (await imageMessageTask)?.Attachments.FirstOrDefault(x => PhotoExtension(x.Filename));
+      if (imageMessage != null)
+      {
+        _logger.LogDebug("Received response message from {DisocrdUser} with {@Attachments}", imageMessage.Author.Username, imageMessage.Attachments);
+      }
+      
+      var imageAttachment = imageMessage?.Attachments.FirstOrDefault(x => PhotoExtension(x.Filename));
+      if (imageAttachment != null)
+      {
+        _logger.LogDebug("Found valid {Attachment}", imageAttachment);
+      }
 
       await _postingService.PostAsync(_playFormatService.FormatPlay(play, imageAttachment?.Url));
       await _notificationService.Notify(playFile.Filename, contentStream, play, Context.User.Id);
